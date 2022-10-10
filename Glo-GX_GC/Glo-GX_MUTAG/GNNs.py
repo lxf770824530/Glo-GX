@@ -37,9 +37,9 @@ class GCN(torch.nn.Module):
         )
 
         self.rgcn = RGCN(self.input_dim, 32, n_relations=4, n_layers=1, inverse_edges=False)
-        self.conv1 = GCNConv(32, 48)
+        self.conv1 = GCNConv(32, 64)
         # self.conv2 = GCNConv(48, 64)
-        self.conv3 = GCNConv(48, 64)
+        self.conv3 = GCNConv(64, 64)
         self.linear1 = Linear(64, 32)
         self.linear2 = Linear(32, self.output_dim)
 
@@ -117,7 +117,7 @@ def Train_model():
     model_save_path = osp.join(model_save_dir, model_name)
     data = TUDataset('data/TUDataset', name = 'MUTAG')
 
-    torch.manual_seed(12345)
+    torch.manual_seed(123)
     dataset = data.shuffle()
 
     train_dataset = dataset[:188]

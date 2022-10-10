@@ -8,7 +8,7 @@ from GNN_Explainer import Explain_model
 
 def arg_parse():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", default = 'train', help = "Setting the mode type. (train / explain)")
+    parser.add_argument("--mode", default = 'explain', help = "Setting the mode type. (train / explain)")
     parser.add_argument("--device", default='cpu', help="Setting the task type. (train / explain)")
 
     # gnn模型“训练”阶段的参数设置
@@ -34,11 +34,13 @@ def arg_parse():
 if __name__ == '__main__':
 
     args = arg_parse()
+    re_run = True
     if args.mode == 'train':
         Train_gcn_model()
     elif args.mode == 'explain':
         start_time = time.time()
-        Explain_model(args)
+        while (re_run):
+            re_run = Explain_model(args)
         end_time = time.time()
         print('time consumption:', end_time-start_time)
 

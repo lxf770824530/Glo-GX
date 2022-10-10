@@ -94,8 +94,8 @@ def Explain_model(args):
     final_node_num_list = []
 
     T = 0.0002
-    j = 0
-    node_num = True
+    roll_back_count = 0
+    rerun_index = False
     while len(G.x) >= final_node_num:
 
         P_J = []
@@ -120,9 +120,13 @@ def Explain_model(args):
 
         lagrangian_optimization = LagrangianOptimization(explainer_optimizer, device)
 
-
+        e_count = 0
+        is_roll_withsame_G = False
         for epoch in range(1000):
 
+            if epoch>=999:
+                e_count=1
+                break
 
             gnn_model.eval()
             batch = torch.zeros((1, len(G.x)), dtype=torch.int64)[0]
@@ -176,6 +180,11 @@ def Explain_model(args):
                     last_G = Data(x=G.x, edge_index=G.edge_index, edge_attr=G.edge_attr)
                 else:
                     G = Data(x=last_G.x, edge_index=last_G.edge_index, edge_attr=last_G.edge_attr)
+                    is_roll_withsame_G = True
+
+                if is_roll_withsame_G:
+                    roll_back_count += 1
+
 
                 if len(G.x) >= final_node_num:
                     node_num_p = len(G.x)
@@ -184,17 +193,31 @@ def Explain_model(args):
                 if len(G.x) == final_node_num:
                     final_node_num_list.append(Data(x=G.x, edge_index=G.edge_index, edge_attr=G.edge_attr))
                 break
-        P_A = sum(P_J) / len(P_J)
-        P_t = P_t_SA(P_t, P_A, T)
-        T = 0.95 * T
+        if roll_back_count > 15:
+            rerun_index = True
+            roll_back_count = 0
+            break
+
+        if is_roll_withsame_G == False:
+            roll_back_count = 0
+
+        if e_count == 1:
+            P_t = 0.97
+            T = 0.0002
+        else:
+            P_A = sum(P_J) / len(P_J)
+            P_t = P_t_SA(P_t, P_A, T)
+            T = 0.95 * T
         # if P_A >= P_t:
         #     P_t = P_A
         P_all.append(P_t)
         explainer.reset_my_parameters()
-
-    print('Node number of current graph: ', node_num_p)
-    print('Probability: ', prebability)
-    print('Probability threshold values: ', P_all)
-    for i,G_l in enumerate(final_node_num_list):
-        Draw_graph(G_l,i)
-
+    if rerun_index:
+        return rerun_index
+    else:
+        print('Node number of current graph: ', node_num_p)
+        print('Probability: ', prebability)
+        print('Probability threshold values: ', P_all)
+        for i,G_l in enumerate(final_node_num_list):
+            Draw_graph(G_l,i)
+        return rerun_index

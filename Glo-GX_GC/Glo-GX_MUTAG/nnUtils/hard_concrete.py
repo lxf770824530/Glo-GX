@@ -5,7 +5,7 @@ from torch import sigmoid
 
 class HardConcrete(torch.nn.Module):
 
-    def __init__(self, beta=1 / 3, gamma=-0.2, zeta=1.0, fix_temp=True, loc_bias=3):
+    def __init__(self, beta=2 / 5, gamma=-0.2, zeta=1.0, fix_temp=True, loc_bias=3):
         super(HardConcrete, self).__init__()
 
         self.temp = beta if fix_temp else Parameter(torch.zeros(1).fill_(beta))

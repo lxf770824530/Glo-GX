@@ -24,8 +24,8 @@ def arg_parse():
     parser.add_argument("--epoch_E", default = 5000, help="Epoch, in explanation stage. (A number such as 100)")
     parser.add_argument("--batch_size_E", default=256, help="batch_size, in explanation stage. (A number such as 32)")
     parser.add_argument("--lr_E", default=0.001, help="Learn rate, in explanation stage. (A number such as 0.001)")
-    parser.add_argument("--initNodeNum", default=13, type=int, help="The number of nodes of initialzed graph . (A number such as 16)")
-    parser.add_argument("--explain_class", default=1, help="Categories that require explanation. (A number such as 0)")
+    parser.add_argument("--initNodeNum", default=16, type=int, help="The number of nodes of initialzed graph . (A number such as 16)")
+    parser.add_argument("--explain_class", default=0, help="Categories that require explanation. (A number such as 0)")
     parser.add_argument("--final_node_number", default=11, help="The final node number of the explanation. (A number such as 11)")
 
     # parser.set_defaults(
@@ -45,12 +45,14 @@ def arg_parse():
 if __name__ == '__main__':
 
     args = arg_parse()
+    re_run = True
 
     if args.mode == 'train':
         Train_model()
     elif args.mode == 'explain':
         start_time = time.time()
-        Explain_model(args)
+        while(re_run):
+            re_run=Explain_model(args)
         end_time = time.time()
         print('time consumption:', end_time-start_time)
 

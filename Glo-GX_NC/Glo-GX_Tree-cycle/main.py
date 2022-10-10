@@ -26,15 +26,7 @@ def arg_parse():
     parser.add_argument("--explain_class", default=1, help="Categories that require explanation. (A number such as 0)")
     parser.add_argument("--final_node_number", default=7, help="The final node number of the explanation")
 
-    # parser.set_defaults(
-    #
-    #     epoch = 100,
-    #     batch_size = 32,
-    #     lr = 0.01,
-    #
-    #     epoch_E = 100
-    #
-    # )
+
     return parser.parse_args()
 
 
@@ -43,12 +35,14 @@ def arg_parse():
 if __name__ == '__main__':
 
     args = arg_parse()
+    re_run = True
 
     if args.mode == 'train':
         Train_gcn_model(args)
     elif args.mode == 'explain':
         start_time = time.time()
-        Explain_model(args)
+        while (re_run):
+            re_run = Explain_model(args)
         end_time = time.time()
         print('time consumption:',end_time-start_time)
 
